@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  suchara_php:
+    restart: always
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+  suchara_nginx:
+    image: nginx:stable-alpine
+    restart: always
+    environment:
+      NGINX_HOST: localhost
+    volumes:
+      - ./suchara.conf:/etc/nginx/conf.d/default.conf
+      - ./public:/app/public
+    ports:
+        - "8085:80"
+
+  suchara_mysql:
+    image: mysql:8
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_USER: suchara
+      MYSQL_PASSWORD: suchara
+      MYSQL_DATABASE: suchara
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    volumes:
+      - ./suchara.sql:/docker-entrypoint-initdb.d/suchara.sql
+      - suchara_mysql:/var/lib/mysql
+
+  suchara_rabbitmq:
+    image: rabbitmq:3-management-alpine
+    restart: always
+    volumes:
+      - suchara_rabbitmq:/var/lib/rabbitmq
+
+  suchara_logger:
+    build:
+      context: logger
+    env_file:
+      - logger/.env
+    restart: always
+
+volumes:
+  suchara_mysql:
+    driver: 'local'
+  suchara_rabbitmq:
+    driver: 'local'

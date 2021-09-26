@@ -1,0 +1,8 @@
+/vendor/
+docker-compose.yml
+Dockerfile
+suchara.conf
+suchara.sql
+.dockerignore
+.env
+logger
