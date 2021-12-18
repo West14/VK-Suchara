@@ -1,0 +1,16 @@
+{
+    "name": "west/rabbitmq-logger",
+    "type": "project",
+    "require": {
+        "php-amqplib/php-amqplib": "^3.0",
+        "vkcom/vk-php-sdk": "^5.101"
+    },
+    "license": "GPL-3.0-only",
+    "authors": [
+        {
+            "name": "West",
+            "email": "West14@GitHub.com"
+        }
+    ],
+    "minimum-stability": "stable"
+}
