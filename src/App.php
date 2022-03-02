@@ -1,11 +1,11 @@
 <?php
 
+use App\Command\Help;
 use App\Command\Log;
 use App\Command\Me;
 use App\Command\Mood;
 use App\Command\Pidor;
 use App\Handler\Confirmation;
-use App\Handler\HandlerResult;
 use App\Handler\Command;
 use App\Handler\MessageCounter;
 use App\Logger\AbstractLogger;
@@ -54,7 +54,8 @@ class App
             'today' => Mood::class,
             'pidor' => Pidor::class,
             'log' => Log::class,
-            'me' => Me::class
+            'me' => Me::class,
+            'help' => Help::class
         ];
 
         $container['vkApi'] = fn(): VKApiClient => new VKApiClient();
@@ -131,7 +132,7 @@ class App
                 break;
             }
         }
-        $this->sendResponse(200,'ok');
+        $this->sendResponse(200, 'ok');
     }
 
     public function sendResponse(int $httpCode, string $body, string $contentType = 'application/json'): void
