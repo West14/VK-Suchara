@@ -76,7 +76,7 @@ class Pidor extends AbstractCommand
 
     public function calculatePidorStreak(): int
     {
-        $stmt = $this->db()->prepare("SELECT `user_id` FROM `pidor_log` WHERE `peer_id` = ? ORDER BY `timestamp` DESC LIMIT 5");
+        $stmt = $this->db()->prepare("SELECT `user_id` FROM `pidor_log` WHERE `peer_id` = ? ORDER BY `timestamp` DESC LIMIT 20");
         $stmt->execute([$this->message['peer_id']]);
 
         $i = 0;
