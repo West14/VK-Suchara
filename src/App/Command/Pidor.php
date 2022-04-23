@@ -57,6 +57,12 @@ class Pidor extends AbstractCommand
             }
 
             $t->sendReply($t->formatUserTag($pidor['id'], "{$pidor['first_name']} {$pidor['last_name']}"));
+
+            $streakPhrase = $t->getPidorStreakPhrase($t->calculatePidorStreak());
+            if ($streakPhrase)
+            {
+                $t->sendReply($streakPhrase);
+            }
         });
     }
 
@@ -66,6 +72,25 @@ class Pidor extends AbstractCommand
         $stmt->execute([$this->message['peer_id'], strtotime('today')]);
 
         return $stmt->fetchColumn();
+    }
+
+    public function calculatePidorStreak(): int
+    {
+        $stmt = $this->db()->prepare("SELECT `user_id` FROM `pidor_log` WHERE `peer_id` = ? ORDER BY `timestamp` DESC LIMIT 5");
+        $stmt->execute([$this->message['peer_id']]);
+
+        $i = 0;
+        $latestPidorId = $stmt->fetchColumn();
+        while ($userId = $stmt->fetchColumn())
+        {
+            if ($userId != $latestPidorId)
+            {
+                break;
+            }
+            $i++;
+        }
+
+        return $i;
     }
 
     public function writePidor(int $userId): void
@@ -130,5 +155,71 @@ class Pidor extends AbstractCommand
                 'Шышл-мышл, пёрнул спермой, вышел'
             ]
         ];
+    }
+
+    public function getPidorStreakPhrase(int $streak): ?string
+    {
+        $phraseMap = [
+            null,
+            [
+                "Посмотрите на него, уже дважды подряд пидарок. Неплохой результат, но ты можешь лучше.",
+                "Хуя, два раза подряд пидор? Срочно звони мамке, пусть похвастается перед соседками",
+                "Однажды пидор — дважды пидор, поздравляю"
+            ],
+            [
+                "Ну, три раза подряд пидор это уже неплохо, время написать разработчику и зарепортить баг (нет)",
+                "Хуя, трижды это уже охуенно! По статистике из интернета только каждый сотый становится тройным пидором!",
+                "Не гордись собой особо, но ты уже трижды как пидор, молодец. Может бахнешь мне донатик по такому случаю?"
+            ],
+            [
+                "Уже 4 раза пидор.",
+                "Четверый подряд, ты заебал",
+                "Поздравляю с 4 пидорскими днями подряд"
+            ],
+            [
+                "Мог бы вообще-то и с друзьями поделиться как ты предпочитаешь делиться своим очком",
+                "5-й раз не пидорас (ладно, пидорас)",
+                "5 дней подряд в этом чате никто не удивлен, что ты пидор"
+            ],
+            [
+                "Ладно, сдаюсь, ты 6-й пидор потому твои друзья (тоже пидоры) задонатили чтобы ты выпадал",
+                "Ты в курсе, что это все твои дружки-петушки занесли чтобы ты выпадал уже 6 раз подряд?",
+                "Шестой день подряд так просто не бывает, может быть это твои дружки занесли бабосиков? Проверь."
+            ],
+            [
+                "На седьмой день бог успел сотворить землю, а ты все еще не успел убедиться, что ты — пидор. ",
+                "Семь это счастливое число, но несчастливое для тех, кто седьмой день подряд пидор.",
+                "Кстати, я наврал, что за тебя занесли денюжку твои пидорки, еще бы кто в этом мире за тебя платил."
+            ],
+            [
+                "Exception in thread \"main\" java.lang.RuntimeException: Pidor 8th day in a row",
+                "Traceback (most recent call last):\nFile \"/pidor_searcher\", line 4, in <module> findPidor()\nPidorError: Pidor 8th day in a row",
+                "Library API: Exception caught in function 'find_pidor'\nBacktrace:\n~/src/detail/Pidor.cpp:17 : Pidor 8th day in a row"
+            ],
+            [
+                "Ладно, ты заебал. В следующий день выберу пидором кого-то другого, ты уже 9 раз подряд забираешь сей гордый титул",
+                "Никогда еще не видел такого грандиозного пидора, 9(!!!) дней подряд, охуеть!",
+                "Ты принц пидарасов"
+            ],
+            [
+                "10 раз подряд.",
+                "Уже 10-й раз подряд ты пидор, грац.",
+                "Ну и че, кого нынче можно удивить пидором 10 раз подряд? Хап тьфу"
+            ]
+        ];
+
+        if ($streak > 9)
+        {
+            $phraseSet = [
+                "Поздравляю, вы прошли эту игру. Выберите пидора еще раз чтобы начать заново.",
+                "Вы прошли Сучару, поделитесь на форуме советами по прохождению",
+                "Титры: \nРазработчик: вас ебать не должно\nСценарист: разработчик\nОсобые благодарности вашим матерям за качественные услуги\nThe end."
+            ];
+        }
+        else
+        {
+            $phraseSet = $phraseMap[$streak];
+        }
+        return $phraseSet ? $phraseSet[array_rand($phraseSet)] : null;
     }
 }
