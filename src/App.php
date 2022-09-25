@@ -189,7 +189,7 @@ class App
         $phrase = $phraseVariantMap[$c['phrase.set']] ?? $phraseVariantMap['default'];
         if (is_array($phrase))
         {
-            $phrase = array_rand($phrase);
+            $phrase = $phrase[array_rand($phrase)];
         }
 
         return $phrase;
