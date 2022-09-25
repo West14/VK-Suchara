@@ -195,6 +195,22 @@ class App
         return $phrase;
     }
 
+    public static function pluralize(int $count): string
+    {
+        if ($count == 1)
+        {
+            return 'one';
+        }
+        else if ($count > 1 && $count < 5)
+        {
+            return 'few';
+        }
+        else
+        {
+            return 'many';
+        }
+    }
+
     public static function app(): self
     {
         return self::$app;
