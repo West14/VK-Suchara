@@ -181,11 +181,18 @@ class App
         return $this->container['request'][$key] ?? null;
     }
 
-    public static function phrase(string $name): ?string
+    public static function phrase(string $name): string
     {
         $c = self::app()->container();
+        $phraseVariantMap = $c['phrase.map'][$name];
 
-        return $c['phrase.map'][$name][$c['phrase.set']] ?? null;
+        $phrase = $phraseVariantMap[$c['phrase.set']] ?? $phraseVariantMap['default'];
+        if (is_array($phrase))
+        {
+            $phrase = array_rand($phrase);
+        }
+
+        return $phrase;
     }
 
     public static function app(): self
