@@ -60,7 +60,7 @@ class App
 
         $container['vkApi'] = fn(): VKApiClient => new VKApiClient();
         $container['db'] = fn(): PDO => new PDO($_ENV['DB_DSN'], $_ENV['DB_USER'], $_ENV['DB_PASSWORD'], [
-            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
         ]);
 
         $container['rabbitmq'] = fn(): AMQPStreamConnection => new AMQPStreamConnection(
@@ -81,6 +81,18 @@ class App
             /** @var AbstractLogger $logger */
             $logger = new $loggerClass;
             return $logger->setup() ? $logger : $c['logger.default'];
+        };
+
+        $container['phrase.map'] = fn (Container $c): array => require self::$dir . '/src/phrases.php';
+        $container['phrase.set'] = function ()
+        {
+            $monthNumber = idate('m');
+            if (in_array($monthNumber, [9, 10]))
+            {
+                return 'army';
+            }
+
+            return 'default';
         };
     }
 
@@ -167,6 +179,13 @@ class App
     public function getFromRequest(string $key): mixed
     {
         return $this->container['request'][$key] ?? null;
+    }
+
+    public static function phrase(string $name): ?string
+    {
+        $c = self::app()->container();
+
+        return $c['phrase.map'][$name][$c['phrase.set']] ?? null;
     }
 
     public static function app(): self
