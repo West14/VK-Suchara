@@ -61,7 +61,7 @@ class Me extends AbstractCommand
     protected function getMessageCountString(string $count): string
     {
         return sprintf(
-            "%s $count %s",
+            "%s $count %s.",
             App::phrase('you_talked'),
             App::phrase('message_' . App::pluralize((int) $count[-1]))
         );
