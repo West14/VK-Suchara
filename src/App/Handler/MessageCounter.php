@@ -18,8 +18,8 @@ class MessageCounter extends AbstractHandler
             return $this->continue();
         }
 
-        $stmt = $db->prepare("INSERT INTO `message_log` (`user_id`, `peer_id`, `message`) VALUES (?, ?, ?)");
-        $stmt->execute([$message['from_id'], $message['peer_id'], $message['text']]);
+        $stmt = $db->prepare("INSERT INTO `message_log` (`user_id`, `peer_id`, `message`, `date`) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$message['from_id'], $message['peer_id'], $message['text'], $message['date']]);
         return $this->continue();
     }
 }
