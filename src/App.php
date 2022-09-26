@@ -7,6 +7,7 @@ use App\Command\Mood;
 use App\Command\Pidor;
 use App\Handler\Confirmation;
 use App\Handler\Command;
+use App\Handler\DevModeGuard;
 use App\Handler\MessageCounter;
 use App\Logger\AbstractLogger;
 use App\Logger\Stderr;
@@ -45,6 +46,7 @@ class App
         $container['handlerMap'] = [
             'confirmation' => [Confirmation::class],
             'message_new' => [
+                DevModeGuard::class,
                 Command::class,
                 MessageCounter::class
             ]
