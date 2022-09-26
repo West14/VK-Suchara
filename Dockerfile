@@ -1,5 +1,5 @@
 FROM composer:latest AS composer
-FROM php:8-fpm-alpine
+FROM php:8.0-fpm-alpine
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 RUN apk add --no-cache oniguruma-dev && \

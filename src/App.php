@@ -7,6 +7,7 @@ use App\Command\Mood;
 use App\Command\Pidor;
 use App\Handler\Confirmation;
 use App\Handler\Command;
+use App\Handler\DevModeGuard;
 use App\Handler\MessageCounter;
 use App\Handler\Talking;
 use App\Logger\AbstractLogger;
@@ -46,6 +47,7 @@ class App
         $container['handlerMap'] = [
             'confirmation' => [Confirmation::class],
             'message_new' => [
+                DevModeGuard::class,
                 Command::class,
                 MessageCounter::class,
 //                Talking::class
@@ -62,7 +64,7 @@ class App
 
         $container['vkApi'] = fn(): VKApiClient => new VKApiClient();
         $container['db'] = fn(): PDO => new PDO($_ENV['DB_DSN'], $_ENV['DB_USER'], $_ENV['DB_PASSWORD'], [
-            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
         ]);
 
         $container['rabbitmq'] = fn(): AMQPStreamConnection => new AMQPStreamConnection(
@@ -83,6 +85,18 @@ class App
             /** @var AbstractLogger $logger */
             $logger = new $loggerClass;
             return $logger->setup() ? $logger : $c['logger.default'];
+        };
+
+        $container['phrase.map'] = fn (Container $c): array => require self::$dir . '/src/phrases.php';
+        $container['phrase.set'] = function ()
+        {
+            $monthNumber = idate('m');
+            if (in_array($monthNumber, [9, 10]))
+            {
+                return 'army';
+            }
+
+            return 'default';
         };
     }
 
@@ -169,6 +183,36 @@ class App
     public function getFromRequest(string $key): mixed
     {
         return $this->container['request'][$key] ?? null;
+    }
+
+    public static function phrase(string $name): string
+    {
+        $c = self::app()->container();
+        $phraseVariantMap = $c['phrase.map'][$name];
+
+        $phrase = $phraseVariantMap[$c['phrase.set']] ?? $phraseVariantMap['default'];
+        if (is_array($phrase))
+        {
+            $phrase = $phrase[array_rand($phrase)];
+        }
+
+        return $phrase;
+    }
+
+    public static function pluralize(int $count): string
+    {
+        if ($count == 1)
+        {
+            return 'one';
+        }
+        else if ($count > 1 && $count < 5)
+        {
+            return 'few';
+        }
+        else
+        {
+            return 'many';
+        }
     }
 
     public static function app(): self

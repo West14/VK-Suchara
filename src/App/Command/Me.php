@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App;
 use JetBrains\PhpStorm\Pure;
 use PDO;
 
@@ -45,10 +46,10 @@ class Me extends AbstractCommand
 
         if ((int) $count == 0)
         {
-            return 'Ты не был пидором ни разу. Пидор.';
+            return App::phrase('you_was_not_pidor');
         }
 
-        return "Ты был пидором $count {$this->getPluralizedCount($lastNum)}.";
+        return App::phrase('you_was_pidor') . " $count {$this->getPluralizedCount($lastNum)}.";
     }
 
     #[Pure]
@@ -59,30 +60,15 @@ class Me extends AbstractCommand
 
     protected function getMessageCountString(string $count): string
     {
-        $lastNum = (int) $count[-1];
-        if ($lastNum == 1)
-        {
-            $char = 'e';
-        }
-        else if ($lastNum > 1 && $lastNum < 5)
-        {
-            $char = 'я';
-        }
-        else
-        {
-            $char = 'й';
-        }
-
-        return "Ты напиздел $count сообщени$char.";
+        return sprintf(
+            "%s $count %s.",
+            App::phrase('you_talked'),
+            App::phrase('message_' . App::pluralize((int) $count[-1]))
+        );
     }
 
     public function getPluralizedCount(int $count): string
     {
-        if ($count > 1 && $count < 5)
-        {
-            return 'раза';
-        }
-
-        return 'раз';
+        return App::phrase('count_' . App::pluralize($count));
     }
 }
