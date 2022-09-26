@@ -9,13 +9,12 @@ class Talking extends AbstractHandler
     public function handle(): HandlerResult
     {
         $message = $this->getMessage();
-        $text = $message['text'];
-
         if ($message['peer_id'] < 2000000000)
         {
             return $this->continue();
         }
 
+        $text = $message['text'];
         if (str_contains(strtolower($text), 'сучара') || $this->isReplyToBot())
         {
             $text = $this->getResponseMessage();

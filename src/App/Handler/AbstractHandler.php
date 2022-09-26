@@ -57,11 +57,6 @@ abstract class AbstractHandler
         return new HandlerResult(false, $response);
     }
 
-    protected function getMessage(): array
-    {
-        return $this->getInput('object')['message'];
-    }
-
     protected function getMessageText(): ?string
     {
         return $this->getMessage()['text'] ?? null;
