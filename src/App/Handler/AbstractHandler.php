@@ -39,6 +39,11 @@ abstract class AbstractHandler
         return $this->app()->getFromRequest($key);
     }
 
+    protected function getMessage(): array
+    {
+        return $this->getInput('object')['message'];
+    }
+
     #[Pure]
     protected function continue(): HandlerResult
     {
