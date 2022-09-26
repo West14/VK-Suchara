@@ -12,6 +12,7 @@ namespace App\Handler;
 use App;
 use JetBrains\PhpStorm\Pure;
 use Psr\Log\LoggerInterface;
+use VK\Client\VKApiClient;
 
 abstract class AbstractHandler
 {
@@ -49,5 +50,29 @@ abstract class AbstractHandler
     protected function break(?string $response = null): HandlerResult
     {
         return new HandlerResult(false, $response);
+    }
+
+    protected function getMessage(): array
+    {
+        return $this->getInput('object')['message'];
+    }
+
+    protected function getMessageText(): ?string
+    {
+        return $this->getMessage()['text'] ?? null;
+    }
+    /** @noinspection PhpUnhandledExceptionInspection */
+    protected function sendReply(string $text, array $params = []): void
+    {
+        $this->vkApi()->messages()->send($_ENV['VK_ACCESS_KEY'], array_merge([
+            'peer_id' => $this->getMessage()['peer_id'],
+            'message' => $text,
+            'random_id' => rand(1, 1000000)
+        ], $params));
+    }
+
+    protected function vkApi(): VKApiClient
+    {
+        return $this->app()->vkApi();
     }
 }

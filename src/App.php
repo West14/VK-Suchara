@@ -8,6 +8,7 @@ use App\Command\Pidor;
 use App\Handler\Confirmation;
 use App\Handler\Command;
 use App\Handler\MessageCounter;
+use App\Handler\Talking;
 use App\Logger\AbstractLogger;
 use App\Logger\Stderr;
 use JetBrains\PhpStorm\NoReturn;
@@ -46,7 +47,8 @@ class App
             'confirmation' => [Confirmation::class],
             'message_new' => [
                 Command::class,
-                MessageCounter::class
+                MessageCounter::class,
+//                Talking::class
             ]
         ];
 

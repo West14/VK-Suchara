@@ -50,7 +50,7 @@ class Command extends AbstractHandler
                 $userId = $message['from_id'];
                 if ($handler?->canUse($userId))
                 {
-                    $this->countCommandUse($peerId, $userId, );
+                    $this->countCommandUse($peerId, $userId);
                     $handler->handle();
                     return $this->break();
                 }

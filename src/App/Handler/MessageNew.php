@@ -15,13 +15,13 @@ use VK\Exceptions\VKApiException;
 
 class MessageNew extends AbstractHandler
 {
-    public function handle(): ?string
+    public function handle(): HandlerResult
     {
         /** @var array $message */
         $message = $this->getInput('object')['message'];
         if ($message['peer_id'] < 2000000000)
         {
-            return null;
+            return $this->continue();
         }
 
         try {
@@ -45,7 +45,7 @@ class MessageNew extends AbstractHandler
             $this->logger()->log(LogLevel::ERROR, $this->app()->formatException($e));
         }
 
-        return null;
+        return $this->continue();
     }
 
     public function isCommand(string $text): bool
